@@ -1,7 +1,7 @@
-﻿export const APP_CONFIG = {
-  appName: 'CareBridge',
-  tagline: 'Bridging the critical gap between hospital discharge and everyday recovery.',
-  apiUrl: '/api',
+export const APP_CONFIG = {
+  appName: 'Nivaan',
+  tagline: 'Continuous Post-Hospital Recovery & Active Elderly Care',
+  apiUrl: 'http://localhost:8080/api',
   version: '1.0.0',
   defaultLanguage: 'en',
   gracePeriodMinutes: 20

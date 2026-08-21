@@ -26,15 +26,13 @@ export const Home = () => {
         <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 shadow-sm backdrop-blur-md">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
           <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider font-mono">
-            Continuous Post-Hospital Recovery &amp; Elderly Care
+            Nivaan • Continuous Post-Hospital Recovery &amp; Elderly Care
           </span>
         </div>
 
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.1]">
+        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1] bg-gradient-to-r from-teal-500 via-indigo-500 to-rose-500 bg-clip-text text-transparent">
           Bridging the gap between <br className="hidden sm:block" />
-          <span className="bg-gradient-to-r from-teal-600 via-indigo-600 to-rose-600 bg-clip-text text-transparent">
-            Discharge &amp; Full Recovery.
-          </span>
+          Discharge &amp; Full Recovery.
         </h1>
 
         <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
@@ -47,7 +45,7 @@ export const Home = () => {
             to={isAuthenticated ? dashboardLink : "/register"}
             className="w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-sm bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 shadow-xl shadow-slate-900/10 transition-all flex items-center justify-center space-x-2 group"
           >
-            <span>{isAuthenticated ? 'Go to Your Dashboard' : 'Get Started with CareBridge'}</span>
+            <span>{isAuthenticated ? 'Go to Your Dashboard' : 'Get Started with Nivaan'}</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
 
@@ -142,7 +140,7 @@ export const Home = () => {
 
       {/* FOOTER */}
       <footer className="pt-12 border-t border-slate-200/60 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-        <p>© 2026 CareBridge • Post-Hospital Recovery &amp; Active Elderly Care Companion</p>
+        <p>© 2026 Nivaan • Post-Hospital Recovery &amp; Active Elderly Care Companion</p>
         <div className="flex items-center space-x-6">
           <Link to="/login" className="hover:text-slate-900 dark:hover:text-white">Sign In</Link>
           <Link to="/register" className="hover:text-slate-900 dark:hover:text-white">Register</Link>

@@ -1,4 +1,4 @@
-﻿package com.carebridge.service;
+package com.carebridge.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -62,9 +62,55 @@ public class GeminiAiService {
                     }
                 }
             }
-            return "Unable to parse document response from Gemini AI.";
+            return "Unable to extract medical summary from Gemini AI.";
         } catch (Exception e) {
-            return "AI Analysis Error: " + e.getMessage();
+            return "Error calling Gemini Vision API: " + e.getMessage();
+        }
+    }
+
+    public String chatWithCareBot(String userMessage, String patientContext) {
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            return "Hello! I am CareBot, your AI Recovery Companion. Please make sure GEMINI_API_KEY is configured for real-time live answers. In general: take medications with water at scheduled times, keep surgical wounds clean & dry, and alert your doctor if you experience chest pain, sudden breathlessness, or fever above 101°F.";
+        }
+
+        try {
+            String geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
+
+            String systemPrompt = "You are 'CareBot', a friendly, compassionate, and medically sound AI Post-Hospital Recovery & Medication Assistant for CareBridge in India. "
+                    + "LANGUAGE & TONE INSTRUCTIONS: "
+                    + "1) You MUST understand both English, Hindi (हिंदी), and Hinglish (Hindi written in Roman script) fluently. "
+                    + "2) If the user asks in Hindi/Hinglish (e.g. 'Dawai khali pet leni hai ya khana khane ke baad?', 'Taanke kab katenge?'), ALWAYS reply back in warm, respectful, and easy-to-understand conversational Hinglish or simple Hindi. "
+                    + "3) Keep answers concise (under 3-4 sentences), reassuring, and medically accurate. "
+                    + "4) CRITICAL EMERGENCY PROTOCOL: If the user describes emergency red-flag symptoms (severe chest pain / seene me dard, sudden breathlessness / saans lene me takleef, severe dizziness / behoshi, bleeding / khoon nikalna), explicitly warn them in their language to immediately tap the Emergency QR Pass or call an ambulance/doctor! "
+                    + "5) Patient Profile & Active Medicines Context: " + (patientContext != null ? patientContext : "None") + "\n\n"
+                    + "User Query: " + userMessage;
+
+            Map<String, Object> textPart = Map.of("text", systemPrompt);
+            Map<String, Object> contentObj = Map.of("parts", List.of(textPart));
+            Map<String, Object> requestBody = Map.of("contents", List.of(contentObj));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+            ResponseEntity<Map> response = restTemplate.postForEntity(geminiUrl, entity, Map.class);
+
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                Map body = response.getBody();
+                List candidates = (List) body.get("candidates");
+                if (candidates != null && !candidates.isEmpty()) {
+                    Map firstCandidate = (Map) candidates.get(0);
+                    Map content = (Map) firstCandidate.get("content");
+                    List resParts = (List) content.get("parts");
+                    if (resParts != null && !resParts.isEmpty()) {
+                        Map firstPart = (Map) resParts.get(0);
+                        return (String) firstPart.get("text");
+                    }
+                }
+            }
+            return "I am here to help you recover comfortably. For specific clinical concerns, always confirm with your attending physician.";
+        } catch (Exception e) {
+            return "CareBot is currently operating in offline guidance mode: Stay well hydrated, rest adequately, and take prescribed medicines at the exact times marked in your checklist.";
         }
     }
 }

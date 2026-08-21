@@ -4,6 +4,7 @@ import { MedicationChecklist } from '../components/MedicationChecklist';
 import { VitalsTelemetry } from '../components/VitalsTelemetry';
 import { RecoveryTimeline } from '../components/RecoveryTimeline';
 import { MedicalLocker } from '../components/MedicalLocker';
+import { CareBot } from '../components/CareBot';
 import { 
   User, 
   QrCode, 
@@ -276,19 +277,12 @@ export const PatientDashboard = () => {
       {showQrModal && (
         <div className="fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl max-w-sm w-full border border-slate-200 dark:border-slate-800 shadow-2xl space-y-6 text-center">
+            
             <div className="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-800">
-              <span className="text-xs font-bold uppercase text-rose-600">CareBridge Emergency Pass</span>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">Emergency QR Pass</h3>
               <button onClick={() => setShowQrModal(false)} className="text-slate-400 hover:text-slate-600">
                 <X className="w-5 h-5" />
               </button>
-            </div>
-
-            <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 flex justify-center">
-              <img 
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://carebridge.app/emergency/CB-${user?.id || '9821'}`} 
-                alt="Emergency QR" 
-                className="w-44 h-44 rounded-xl"
-              />
             </div>
 
             <div className="space-y-1 text-left bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl text-xs text-slate-700 dark:text-slate-300">
@@ -306,6 +300,9 @@ export const PatientDashboard = () => {
           </div>
         </div>
       )}
+
+      {/* 🤖 Floating CareBot AI Clinical Assistant */}
+      <CareBot />
 
     </div>
   );
