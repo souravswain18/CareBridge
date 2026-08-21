@@ -21,6 +21,26 @@ export const EmergencyHealthCard = () => {
   const { qrToken } = useParams();
   const [activeTab, setActiveTab] = useState('SNAPSHOT'); // 'SNAPSHOT' or 'HOSPITALS'
 
+  // Dynamic Patient Profile & Meds Resolution
+  const [patientData, setPatientData] = useState(() => {
+    // 1. Check logged-in user or stored token profile
+    const loggedUser = JSON.parse(localStorage.getItem('carebridge_user') || '{}');
+    const email = loggedUser.email || 'patient';
+    
+    const savedReminders = JSON.parse(localStorage.getItem(`carebridge_reminders_${email}`) || '[]');
+    const savedProfile = JSON.parse(localStorage.getItem(`carebridge_profile_${email}`) || '{}');
+    
+    return {
+      name: loggedUser.name || savedProfile.name || 'Patient Profile',
+      bloodGroup: savedProfile.bloodGroup || 'Not Specified',
+      allergies: savedProfile.allergies || 'None Reported',
+      caregiverName: savedProfile.caregiverName || 'Not Linked Yet',
+      caregiverPhone: savedProfile.caregiverPhone || 'No Phone Linked',
+      condition: savedProfile.condition || 'General Post-Hospital Recovery',
+      reminders: savedReminders
+    };
+  });
+
   // Nearby Verified Emergency Trauma Centers
   const NEARBY_HOSPITALS = [
     {
@@ -53,7 +73,7 @@ export const EmergencyHealthCard = () => {
   ];
 
   const handleCallSOS = () => {
-    window.location.href = 'tel:+919876543210';
+    window.location.href = `tel:${patientData.caregiverPhone.replace(/\s+/g, '')}`;
   };
 
   const handleCallHospital = (phone) => {
@@ -78,10 +98,10 @@ export const EmergencyHealthCard = () => {
                 <span className="text-xs font-mono opacity-80">TOKEN: {qrToken || 'CB-7821'}</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1">
-                Medical Bystander &amp; Responder Pass
+                {patientData.name}'s Medical Pass
               </h1>
               <p className="text-xs text-rose-100 mt-0.5">
-                No authentication required. Verified post-hospital recovery clinical profile.
+                No authentication required. Scannable emergency clinical summary.
               </p>
             </div>
           </div>
@@ -91,7 +111,7 @@ export const EmergencyHealthCard = () => {
             className="px-6 py-3.5 rounded-2xl text-xs font-black uppercase tracking-wider bg-white text-rose-600 hover:bg-rose-50 transition-all shadow-lg flex items-center justify-center space-x-2 shrink-0 animate-bounce"
           >
             <Phone className="w-4 h-4 text-rose-600 fill-rose-600" />
-            <span>Call Family Guardian (SOS)</span>
+            <span>Call Guardian (SOS)</span>
           </button>
         </div>
       </div>
@@ -132,8 +152,8 @@ export const EmergencyHealthCard = () => {
             {/* Blood Group */}
             <div className="p-5 rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/80 dark:border-slate-800 shadow-xl shadow-slate-900/5 text-center space-y-1">
               <span className="text-[11px] font-mono font-bold uppercase text-slate-400">Blood Group</span>
-              <p className="text-3xl font-black text-rose-600 dark:text-rose-400">O+ Positive</p>
-              <span className="text-[10px] text-slate-500">Universal Compatible Donor Ready</span>
+              <p className="text-3xl font-black text-rose-600 dark:text-rose-400">{patientData.bloodGroup}</p>
+              <span className="text-[10px] text-slate-500">Universal Donor Ready</span>
             </div>
 
             {/* Critical Allergies */}
@@ -142,15 +162,15 @@ export const EmergencyHealthCard = () => {
                 <AlertTriangle className="w-3.5 h-3.5 mr-1" />
                 Severe Allergies
               </span>
-              <p className="text-lg font-black text-amber-900 dark:text-amber-200">PENICILLIN &amp; SULFA</p>
-              <span className="text-[10px] text-amber-800/80 dark:text-amber-300">Avoid Beta-lactam antibiotics</span>
+              <p className="text-base font-black text-amber-900 dark:text-amber-200 uppercase">{patientData.allergies}</p>
+              <span className="text-[10px] text-amber-800/80 dark:text-amber-300">Clinical Precaution Required</span>
             </div>
 
             {/* Guardian Contact */}
             <div className="p-5 rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/80 dark:border-slate-800 shadow-xl shadow-slate-900/5 space-y-1 text-center">
               <span className="text-[11px] font-mono font-bold uppercase text-slate-400">Primary Caregiver</span>
-              <p className="text-base font-bold text-slate-900 dark:text-white">Sourav (Son)</p>
-              <p className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-semibold">+91 98765 43210</p>
+              <p className="text-base font-bold text-slate-900 dark:text-white">{patientData.caregiverName}</p>
+              <p className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-semibold">{patientData.caregiverPhone}</p>
             </div>
 
           </div>
@@ -163,50 +183,48 @@ export const EmergencyHealthCard = () => {
                 Clinical Context
               </span>
               <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                Active Post-Hospital Diagnoses
+                Active Post-Hospital Diagnoses &amp; Care
               </h3>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1">
-                <h4 className="text-xs font-bold text-slate-900 dark:text-white">Post-Op Knee Arthroplasty (Right)</h4>
-                <p className="text-[11px] text-slate-500">Day 12 of 30 recovery window. Wound dressing active.</p>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1">
-                <h4 className="text-xs font-bold text-slate-900 dark:text-white">Hypertension &amp; Type-2 Diabetes</h4>
-                <p className="text-[11px] text-slate-500">Maintained on daily morning ARB &amp; Metformin therapy.</p>
-              </div>
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1">
+              <h4 className="text-xs font-bold text-slate-900 dark:text-white">{patientData.condition}</h4>
+              <p className="text-[11px] text-slate-500">Under continuous active post-discharge care protocol.</p>
             </div>
 
             {/* Prescribed Active Medicines */}
             <div className="space-y-3 pt-2">
               <h4 className="text-xs font-mono font-bold uppercase text-slate-500 flex items-center space-x-1">
                 <Pill className="w-3.5 h-3.5 mr-1" />
-                Current Prescribed Regimen
+                Current Prescribed Regimen ({patientData.reminders.length})
               </h4>
 
-              <div className="space-y-2">
-                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                  <div>
-                    <h5 className="text-xs font-bold text-slate-900 dark:text-white">Telmisartan 40mg (Telma)</h5>
-                    <span className="text-[10px] text-slate-500">1 Tablet daily before breakfast • Blood Pressure</span>
-                  </div>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-semibold">
-                    ACTIVE
-                  </span>
+              {patientData.reminders.length === 0 ? (
+                <div className="p-4 text-center text-xs text-slate-400 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
+                  No active medicines added yet. Medicines added in patient checklist will appear here in real-time.
                 </div>
-
-                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                  <div>
-                    <h5 className="text-xs font-bold text-slate-900 dark:text-white">Ecosprin 75mg (Aspirin)</h5>
-                    <span className="text-[10px] text-slate-500">1 Tablet with dinner • Blood Thinner</span>
-                  </div>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 font-semibold">
-                    CAUTION: BLOOD THINNER
-                  </span>
+              ) : (
+                <div className="space-y-2">
+                  {patientData.reminders.map((med) => (
+                    <div 
+                      key={med.id}
+                      className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between"
+                    >
+                      <div>
+                        <h5 className="text-xs font-bold text-slate-900 dark:text-white">{med.name}</h5>
+                        <span className="text-[10px] text-slate-500">Scheduled at {med.time} • {med.dosage}</span>
+                      </div>
+                      <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-semibold ${
+                        med.taken 
+                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' 
+                          : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                      }`}>
+                        {med.taken ? 'TAKEN TODAY' : 'ACTIVE SCHEDULE'}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-              </div>
+              )}
             </div>
 
           </div>

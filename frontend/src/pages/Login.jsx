@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { APP_CONFIG } from '../config';
@@ -19,14 +19,7 @@ export const Login = () => {
     setLoading(true);
 
     try {
-      const authenticatedUser = {
-        id: Date.now(),
-        name: email.split('@')[0],
-        email: email,
-        role: role
-      };
-      
-      login(authenticatedUser, 'auth-jwt-token');
+      await login(email, password, role);
       if (role === 'PATIENT') {
         navigate('/patient-dashboard');
       } else {
@@ -82,13 +75,15 @@ export const Login = () => {
           </button>
         </div>
 
+        {/* Single Clean Error Alert */}
+        {error && (
+          <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-xs font-semibold text-rose-700 dark:text-rose-300 text-center">
+            ⚠️ {error}
+          </div>
+        )}
+
         {/* Form */}
         <form className="space-y-4" onSubmit={handleSubmit}>
-          {error && (
-            <div className="p-3 text-xs text-rose-700 bg-rose-50/80 dark:bg-rose-950/40 rounded-xl border border-rose-200">
-              {error}
-            </div>
-          )}
 
           <div>
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 pl-1">

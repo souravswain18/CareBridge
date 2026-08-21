@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { APP_CONFIG } from '../config';
@@ -11,26 +11,33 @@ export const Register = () => {
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState('PATIENT');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const [error, setError] = useState('');
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
-    const newUser = {
-      id: Date.now(),
-      name,
-      email,
-      phone,
-      role
-    };
+    try {
+      await register({
+        name,
+        email,
+        password,
+        phone,
+        role
+      });
 
-    login(newUser, 'auth-jwt-token');
-    if (role === 'PATIENT') {
-      navigate('/patient-dashboard');
-    } else {
-      navigate('/caregiver-dashboard');
+      if (role === 'PATIENT') {
+        navigate('/patient-dashboard');
+      } else {
+        navigate('/caregiver-dashboard');
+      }
+    } catch (err) {
+      setError(err.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 

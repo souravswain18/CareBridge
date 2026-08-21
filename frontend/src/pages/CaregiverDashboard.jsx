@@ -207,11 +207,12 @@ export const CaregiverDashboard = () => {
 
     const code = linkCodeInput.trim().toUpperCase();
     const displayName = patientNameInput.trim() || `Patient (${code})`;
+    const targetEmail = `patient.${code.toLowerCase()}@carebridge.com`;
     
     const newLinked = {
       id: String(Date.now()),
       name: displayName,
-      email: `patient.${code.toLowerCase()}@carebridge.com`,
+      email: targetEmail,
       linkCode: code,
       status: 'Connected'
     };
@@ -219,6 +220,16 @@ export const CaregiverDashboard = () => {
     const updated = [...patients, newLinked];
     setPatients(updated);
     setSelectedPatientId(newLinked.id);
+
+    // Auto-sync Caregiver contact details into Patient's emergency profile
+    const existingPatientProfile = JSON.parse(localStorage.getItem(`carebridge_profile_${targetEmail}`) || '{}');
+    const updatedPatientProfile = {
+      ...existingPatientProfile,
+      caregiverName: user?.name || 'Primary Caregiver',
+      caregiverPhone: user?.phone || '+91 98765 43210'
+    };
+    localStorage.setItem(`carebridge_profile_${targetEmail}`, JSON.stringify(updatedPatientProfile));
+
     setPatientNameInput('');
     setLinkCodeInput('');
     setShowConnectModal(false);

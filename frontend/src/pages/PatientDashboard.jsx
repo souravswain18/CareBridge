@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { MedicationChecklist } from '../components/MedicationChecklist';
 import { VitalsTelemetry } from '../components/VitalsTelemetry';
@@ -7,12 +7,43 @@ import { MedicalLocker } from '../components/MedicalLocker';
 import { 
   User, 
   QrCode, 
-  X
+  X,
+  ShieldAlert
 } from 'lucide-react';
 
 export const PatientDashboard = () => {
   const { user } = useAuth();
   const [showQrModal, setShowQrModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  
+  // Dynamic Clinical Profile State
+  const [profile, setProfile] = useState(() => {
+    const saved = localStorage.getItem(`carebridge_profile_${user?.email}`);
+    return saved ? JSON.parse(saved) : {
+      bloodGroup: 'Not Specified',
+      allergies: 'None Reported',
+      condition: 'Post-Discharge Recovery',
+      caregiverName: 'Not Linked Yet',
+      caregiverPhone: 'No Phone Linked'
+    };
+  });
+
+  const [editBloodGroup, setEditBloodGroup] = useState(profile.bloodGroup);
+  const [editAllergies, setEditAllergies] = useState(profile.allergies === 'None Reported' ? '' : profile.allergies);
+  const [editCondition, setEditCondition] = useState(profile.condition === 'Post-Discharge Recovery' ? '' : profile.condition);
+
+  const handleSaveProfile = (e) => {
+    e.preventDefault();
+    const updated = {
+      ...profile,
+      bloodGroup: editBloodGroup || 'Not Specified',
+      allergies: editAllergies.trim() || 'None Reported',
+      condition: editCondition.trim() || 'Post-Discharge Recovery'
+    };
+    setProfile(updated);
+    localStorage.setItem(`carebridge_profile_${user?.email}`, JSON.stringify(updated));
+    setShowProfileModal(false);
+  };
 
   // Dynamic Reminders State (Saved in LocalStorage per user)
   const [reminders, setReminders] = useState(() => {
@@ -94,12 +125,21 @@ export const PatientDashboard = () => {
           </div>
         </div>
 
+        {/* Emergency Pass Quick Actions */}
         <div className="flex items-center space-x-3">
           <button
-            onClick={() => setShowQrModal(true)}
-            className="px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white/90 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-white transition-all shadow-sm flex items-center space-x-2"
+            onClick={() => setShowProfileModal(true)}
+            className="px-4 py-2.5 rounded-2xl bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm flex items-center space-x-2"
           >
-            <QrCode className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+            <ShieldAlert className="w-4 h-4 text-indigo-500" />
+            <span>Edit Medical Profile</span>
+          </button>
+
+          <button
+            onClick={() => setShowQrModal(true)}
+            className="px-4 py-2.5 rounded-2xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-950 border border-rose-200 dark:border-rose-800 text-xs font-bold text-rose-600 dark:text-rose-400 transition-all shadow-sm flex items-center space-x-2"
+          >
+            <QrCode className="w-4 h-4" />
             <span>Emergency QR Pass</span>
           </button>
         </div>
@@ -131,6 +171,106 @@ export const PatientDashboard = () => {
         </div>
 
       </div>
+
+      {/* ⚙️ Edit Medical Profile Modal (Blood Group, Allergies, Diagnosis) */}
+      {showProfileModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl max-w-md w-full border border-slate-200 dark:border-slate-800 shadow-2xl space-y-6">
+            <div className="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center space-x-2">
+                <div className="p-2 bg-indigo-100 dark:bg-indigo-950 text-indigo-600 rounded-xl">
+                  <ShieldAlert className="w-4 h-4" />
+                </div>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                  Emergency Medical Profile
+                </h3>
+              </div>
+              <button onClick={() => setShowProfileModal(false)} className="text-slate-400 hover:text-slate-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveProfile} className="space-y-4 text-left">
+              {/* Blood Group */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Blood Group
+                </label>
+                <select
+                  value={editBloodGroup}
+                  onChange={(e) => setEditBloodGroup(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-800"
+                >
+                  <option value="Not Specified">Not Specified</option>
+                  <option value="A+ Positive">A+ Positive</option>
+                  <option value="A- Negative">A- Negative</option>
+                  <option value="B+ Positive">B+ Positive</option>
+                  <option value="B- Negative">B- Negative</option>
+                  <option value="O+ Positive">O+ Positive</option>
+                  <option value="O- Negative">O- Negative</option>
+                  <option value="AB+ Positive">AB+ Positive</option>
+                  <option value="AB- Negative">AB- Negative</option>
+                </select>
+              </div>
+
+              {/* Severe Allergies */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Severe Drug / Food Allergies
+                </label>
+                <input
+                  type="text"
+                  value={editAllergies}
+                  onChange={(e) => setEditAllergies(e.target.value)}
+                  placeholder="e.g. Penicillin, Sulfa, Peanuts"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-800"
+                />
+                <span className="text-[10px] text-slate-400">Displayed in high-priority red on Emergency Pass</span>
+              </div>
+
+              {/* Diagnosis / Surgery */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Post-Hospital Diagnosis / Procedure
+                </label>
+                <input
+                  type="text"
+                  value={editCondition}
+                  onChange={(e) => setEditCondition(e.target.value)}
+                  placeholder="e.g. Post-Op Knee Replacement, Hypertension"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-800"
+                />
+              </div>
+
+              {/* Primary Caregiver Connection Status Info */}
+              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-600 dark:text-slate-300 space-y-1">
+                <span className="font-bold text-indigo-600 dark:text-indigo-400">Connected Caregiver Guardian:</span>
+                <p>
+                  {profile.caregiverName !== 'Not Linked Yet' 
+                    ? `✓ Linked: ${profile.caregiverName} (${profile.caregiverPhone})` 
+                    : '⏳ Not connected yet. Will automatically show once Caregiver enters your Link Code.'}
+                </p>
+              </div>
+
+              <div className="flex space-x-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowProfileModal(false)}
+                  className="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-slate-900 dark:bg-white dark:text-slate-900 shadow-sm"
+                >
+                  Save Profile
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Emergency QR Modal */}
       {showQrModal && (
