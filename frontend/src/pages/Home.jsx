@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { 
   HeartPulse, 
   ShieldCheck, 
@@ -13,6 +14,9 @@ import {
 } from 'lucide-react';
 
 export const Home = () => {
+  const { user, isAuthenticated } = useAuth();
+  const dashboardLink = user?.role === 'CAREGIVER' ? '/caregiver-dashboard' : '/patient-dashboard';
+
   return (
     <div className="space-y-24 py-12 px-6 sm:px-10 lg:px-16 max-w-7xl mx-auto">
       
@@ -40,18 +44,18 @@ export const Home = () => {
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
           <Link
-            to="/register"
+            to={isAuthenticated ? dashboardLink : "/register"}
             className="w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-sm bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 shadow-xl shadow-slate-900/10 transition-all flex items-center justify-center space-x-2 group"
           >
-            <span>Get Started with CareBridge</span>
+            <span>{isAuthenticated ? 'Go to Your Dashboard' : 'Get Started with CareBridge'}</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
 
           <Link
-            to="/emergency"
-            className="w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-sm bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200 dark:border-rose-800/80 transition-all flex items-center justify-center space-x-2"
+            to="/emergency/CB-7821"
+            className="w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-sm bg-white/80 text-slate-800 hover:bg-white dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all flex items-center justify-center space-x-2 shadow-sm"
           >
-            <QrCode className="w-4 h-4" />
+            <QrCode className="w-4 h-4 text-slate-600 dark:text-slate-400" />
             <span>View Emergency Health Pass</span>
           </Link>
         </div>
