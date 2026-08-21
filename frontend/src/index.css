@@ -1,0 +1,13 @@
+﻿@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  body {
+    @apply bg-gradient-to-b from-[#b8d2ed] via-[#d4e4f7] to-[#e8f1fc] text-slate-800 transition-colors duration-300 min-h-screen antialiased;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  }
+  .dark body {
+    @apply bg-gradient-to-b from-[#0f172a] via-[#1e293b] to-[#0f172a] text-slate-100;
+  }
+}
