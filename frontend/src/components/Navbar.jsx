@@ -41,19 +41,19 @@ export const Navbar = () => {
             <Link 
               to="/" 
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="text-xs font-semibold text-slate-700 hover:text-slate-950 dark:text-slate-200 dark:hover:text-white transition-colors"
+              className="text-xs font-semibold text-slate-700 hover:text-slate-950 dark:text-slate-300 dark:hover:text-white transition-colors"
             >
               Home
             </Link>
             <a 
               href="/#how-it-works" 
-              className="text-xs font-semibold text-slate-700 hover:text-slate-950 dark:text-slate-200 dark:hover:text-white transition-colors"
+              className="text-xs font-semibold text-slate-700 hover:text-slate-950 dark:text-slate-300 dark:hover:text-white transition-colors"
             >
               How it works
             </a>
             <Link 
               to="/emergency/CB-7821" 
-              className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline transition-colors"
+              className="text-xs font-semibold text-slate-700 hover:text-rose-600 dark:text-slate-300 dark:hover:text-rose-400 transition-colors"
             >
               Emergency Pass
             </Link>
