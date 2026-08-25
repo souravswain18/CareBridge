@@ -72,6 +72,29 @@ export const AuthProvider = ({ children }) => {
     return newUser;
   };
 
+  const updateUserProfile = (updatedFields) => {
+    const updatedUser = {
+      ...user,
+      ...updatedFields
+    };
+
+    setUser(updatedUser);
+    localStorage.setItem('carebridge_user', JSON.stringify(updatedUser));
+
+    // Also update in registered users database
+    const registeredUsers = JSON.parse(localStorage.getItem('carebridge_registered_users') || '[]');
+    const userIndex = registeredUsers.findIndex(u => u.email.toLowerCase() === user.email.toLowerCase());
+    if (userIndex !== -1) {
+      registeredUsers[userIndex] = {
+        ...registeredUsers[userIndex],
+        ...updatedFields
+      };
+      localStorage.setItem('carebridge_registered_users', JSON.stringify(registeredUsers));
+    }
+
+    return updatedUser;
+  };
+
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
@@ -80,7 +103,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, login, register, updateUserProfile, logout, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );
