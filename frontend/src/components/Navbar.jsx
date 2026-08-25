@@ -72,8 +72,11 @@ export const Navbar = () => {
         <div className="flex items-center justify-between h-24">
           
           {/* Brand Logo & Name */}
-          <Link to="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white font-sans">
+          <Link to="/" className="flex items-center space-x-3 group">
+            <div className="w-10 h-10 rounded-2xl overflow-hidden shadow-md group-hover:scale-105 transition-transform flex items-center justify-center bg-slate-900 border border-slate-700/50">
+              <img src="/logo.png" alt="Nivaan Logo" className="w-full h-full object-cover" />
+            </div>
+            <span className="text-2xl font-black tracking-tight text-slate-900 dark:text-white font-sans">
               {APP_CONFIG.appName}
             </span>
           </Link>
