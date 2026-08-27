@@ -270,29 +270,29 @@ export const CaregiverDashboard = () => {
           </div>
         </div>
 
-        {/* Patient Switcher Dropdown & Add Button */}
-        <div className="flex items-center space-x-3">
+        {/* Patient Switcher Dropdown & Add Button (Mobile-friendly flex wrap) */}
+        <div className="flex flex-wrap items-center gap-2.5">
           {patients.length > 0 && (
             <div className="flex items-center space-x-2">
               <div className="relative">
                 <select
                   value={selectedPatientId}
                   onChange={(e) => setSelectedPatientId(e.target.value)}
-                  className="appearance-none pl-4 pr-10 py-2.5 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-200 bg-white/90 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-800 cursor-pointer"
+                  className="appearance-none pl-3 pr-8 py-2.5 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-200 bg-white/90 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-800 cursor-pointer max-w-[200px] truncate"
                 >
                   {patients.map(p => (
                     <option key={p.id} value={p.id}>
-                      👤 Monitoring: {p.name}
+                      👤 {p.name}
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none" />
+                <ChevronDown className="w-4 h-4 text-slate-400 absolute right-2.5 top-3 pointer-events-none" />
               </div>
 
               {currentPatient && (
                 <button
                   onClick={() => handleDisconnectPatient(currentPatient.id)}
-                  className="p-2.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-colors border border-slate-200 dark:border-slate-700"
+                  className="p-2.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-colors border border-slate-200 dark:border-slate-700 shrink-0"
                   title="Unlink this patient"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -303,7 +303,7 @@ export const CaregiverDashboard = () => {
 
           <button
             onClick={() => setShowConnectModal(true)}
-            className="px-4 py-2.5 rounded-xl text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 transition-all shadow-sm flex items-center space-x-1.5"
+            className="px-3.5 py-2.5 rounded-xl text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 transition-all shadow-sm flex items-center space-x-1.5 shrink-0"
           >
             <Plus className="w-4 h-4" />
             <span>Connect Patient</span>
@@ -336,11 +336,8 @@ export const CaregiverDashboard = () => {
         /* Main Caregiver Grid */
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
-          {/* Left Column (7 Cols): Remote Vitals Telemetry */}
-          <div className="lg:col-span-7 space-y-8">
-            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-white/80 dark:border-slate-800 shadow-xl shadow-slate-900/5 space-y-6">
-              
-              <div className="flex items-center justify-between">
+              {/* Clean Mobile-Responsive Telemetry Header */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-100 dark:border-slate-800/80">
                 <div>
                   <span className="text-xs font-semibold uppercase tracking-wider text-rose-600 dark:text-rose-400">
                     Remote Telemetry Feed
@@ -350,46 +347,47 @@ export const CaregiverDashboard = () => {
                   </h2>
                 </div>
 
-                <div className="p-1 bg-slate-200/60 dark:bg-slate-800/80 rounded-xl flex space-x-1 border border-slate-200/60">
-                
-                {/* Direct Actions */}
-                <div className="flex items-center space-x-3">
+                {/* Actions & Graph Controls (Wrapped & Stacked cleanly for mobile) */}
+                <div className="flex flex-wrap items-center gap-2">
                   <button
                     onClick={handleWhatsAppAlert}
-                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-md flex items-center space-x-1.5"
+                    className="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-sm flex items-center space-x-1.5"
                   >
-                    <MessageSquare className="w-4 h-4" />
+                    <MessageSquare className="w-3.5 h-3.5" />
                     <span>WhatsApp Alert</span>
                   </button>
 
                   <button
                     onClick={() => setShowCallModal(true)}
-                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 transition-colors shadow-md flex items-center space-x-1.5"
+                    className="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 transition-colors shadow-sm flex items-center space-x-1.5"
                   >
-                    <Phone className="w-4 h-4" />
-                    <span>Contact / Call Patient</span>
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>Call Patient</span>
                   </button>
-                </div>
-                  <button
-                    onClick={() => setActiveTab('BP')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                      activeTab === 'BP'
-                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-                    }`}
-                  >
-                    Blood Pressure
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('SUGAR')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                      activeTab === 'SUGAR'
-                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-                    }`}
-                  >
-                    Blood Sugar
-                  </button>
+
+                  {/* BP / Sugar Toggle Tabs */}
+                  <div className="p-1 bg-slate-200/60 dark:bg-slate-800/80 rounded-xl flex space-x-1 border border-slate-200/60">
+                    <button
+                      onClick={() => setActiveTab('BP')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        activeTab === 'BP'
+                          ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                      }`}
+                    >
+                      BP
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('SUGAR')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        activeTab === 'SUGAR'
+                          ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                      }`}
+                    >
+                      Sugar
+                    </button>
+                  </div>
                 </div>
               </div>
 
