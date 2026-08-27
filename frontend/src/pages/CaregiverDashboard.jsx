@@ -85,7 +85,8 @@ export const CaregiverDashboard = () => {
   const [newMilestoneDesc, setNewMilestoneDesc] = useState('');
 
   useEffect(() => {
-    if (currentPatient?.email) {
+    if (currentPatient) {
+      // 1. Initial Local Cache Load
       const savedReminders = localStorage.getItem(`carebridge_reminders_${currentPatient.email}`);
       setPatientReminders(savedReminders ? JSON.parse(savedReminders) : []);
 
@@ -102,6 +103,31 @@ export const CaregiverDashboard = () => {
           completed: true
         }
       ]);
+
+      // 2. Live Cloud Database Telemetry Sync
+      const fetchLiveTelemetry = async () => {
+        try {
+          const code = currentPatient.linkCode || 'CB-7821';
+          const res = await fetch(`${APP_CONFIG.apiUrl}/caregiver/patient/${code}/telemetry`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.reminders && data.reminders.length > 0) {
+              setPatientReminders(data.reminders);
+              localStorage.setItem(`carebridge_reminders_${currentPatient.email}`, JSON.stringify(data.reminders));
+            }
+            if (data.vitals && data.vitals.length > 0) {
+              setPatientVitals(data.vitals);
+              localStorage.setItem(`carebridge_vitals_${currentPatient.email}`, JSON.stringify(data.vitals));
+            }
+          }
+        } catch (e) {
+          console.log('Cloud sync note: using cached client telemetry');
+        }
+      };
+
+      fetchLiveTelemetry();
+      const interval = setInterval(fetchLiveTelemetry, 10000); // Polling every 10s for real-time live sync
+      return () => clearInterval(interval);
     } else {
       setPatientReminders([]);
       setPatientVitals([]);
