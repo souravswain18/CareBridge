@@ -32,7 +32,7 @@ public class EmergencyPassController {
         }
 
         PatientProfile profile = profileOpt.get();
-        List<Reminder> reminders = reminderRepository.findByPatientId(profile.getUser().getId());
+        List<Reminder> reminders = reminderRepository.findByPatientIdOrderByScheduledTimeAsc(profile.getUser().getId());
 
         Map<String, Object> response = new HashMap<>();
         response.put("name", profile.getUser().getName());

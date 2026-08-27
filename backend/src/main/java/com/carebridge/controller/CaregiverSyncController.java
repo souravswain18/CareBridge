@@ -32,8 +32,8 @@ public class CaregiverSyncController {
         PatientProfile profile = profileOpt.get();
         Long patientUserId = profile.getUser().getId();
 
-        List<Reminder> reminders = reminderRepository.findByPatientId(patientUserId);
-        List<VitalsLog> vitals = vitalsLogRepository.findByPatientIdOrderByTimestampAsc(patientUserId);
+        List<Reminder> reminders = reminderRepository.findByPatientIdOrderByScheduledTimeAsc(patientUserId);
+        List<VitalsLog> vitals = vitalsLogRepository.findByPatientIdOrderByLoggedAtDesc(patientUserId);
 
         Map<String, Object> result = new HashMap<>();
         result.put("patientId", patientUserId);
