@@ -30,14 +30,22 @@ export const EmergencyHealthCard = () => {
     const savedReminders = JSON.parse(localStorage.getItem(`carebridge_reminders_${email}`) || '[]');
     const savedProfile = JSON.parse(localStorage.getItem(`carebridge_profile_${email}`) || '{}');
     
+    // Default seed data for public mobile scans without local session
+    const defaultReminders = [
+      { id: '1', name: 'Pan 40 (Pantoprazole)', time: '08:00 AM', dosage: '40mg • Before Breakfast', taken: true },
+      { id: '2', name: 'Telmisartan BP Guard', time: '09:00 AM', dosage: '40mg • Post Breakfast', taken: true },
+      { id: '3', name: 'Paracetamol / Dolo 650', time: '02:00 PM', dosage: '650mg • Post Lunch', taken: false },
+      { id: '4', name: 'Metformin Sugar Care', time: '08:30 PM', dosage: '500mg • Post Dinner', taken: false }
+    ];
+
     return {
-      name: loggedUser.name || savedProfile.name || 'Patient Profile',
-      bloodGroup: savedProfile.bloodGroup || 'Not Specified',
-      allergies: savedProfile.allergies || 'None Reported',
-      caregiverName: savedProfile.caregiverName || 'Not Linked Yet',
-      caregiverPhone: savedProfile.caregiverPhone || 'No Phone Linked',
-      condition: savedProfile.condition || 'General Post-Hospital Recovery',
-      reminders: savedReminders
+      name: loggedUser.name || savedProfile.name || 'Ramesh Kumar (Patient)',
+      bloodGroup: savedProfile.bloodGroup || 'O +ve (Positive)',
+      allergies: savedProfile.allergies || 'Penicillin, Sulfa Drugs',
+      caregiverName: savedProfile.caregiverName || 'Priya Sharma (Daughter)',
+      caregiverPhone: savedProfile.caregiverPhone || '+91 98765 43210',
+      condition: savedProfile.condition || 'Post-Op Knee Arthroplasty • Stage 2 Cardiac Recovery',
+      reminders: savedReminders.length > 0 ? savedReminders : defaultReminders
     };
   });
 
