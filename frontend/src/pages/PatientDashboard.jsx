@@ -285,17 +285,31 @@ export const PatientDashboard = () => {
               </button>
             </div>
 
-            <div className="space-y-1 text-left bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl text-xs text-slate-700 dark:text-slate-300">
+            {/* Scannable Live QR Code */}
+            <div className="flex flex-col items-center justify-center p-5 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
+              <div className="p-3 bg-white rounded-2xl shadow-md border border-slate-200">
+                <img 
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(window.location.origin + '/emergency/CB-' + (user?.id ? String(user.id).slice(-4) : '7821'))}&color=0f172a`} 
+                  alt="Emergency Medical QR Pass" 
+                  className="w-40 h-40 object-contain rounded-lg"
+                />
+              </div>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                Scan with any smartphone camera to open emergency snapshot
+              </p>
+            </div>
+
+            <div className="space-y-1.5 text-left bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl text-xs text-slate-700 dark:text-slate-300">
               <p><strong>Patient:</strong> {user?.name}</p>
-              <p><strong>Emergency Ref:</strong> CB-{user?.id ? String(user.id).slice(-4) : '9821'}</p>
-              <p><strong>Profile Type:</strong> Continuous Care Member</p>
+              <p><strong>Emergency Ref:</strong> CB-{user?.id ? String(user.id).slice(-4) : '7821'}</p>
+              <p><strong>Direct Link:</strong> <a href={`/emergency/CB-${user?.id ? String(user.id).slice(-4) : '7821'}`} target="_blank" rel="noreferrer" className="text-indigo-600 dark:text-indigo-400 underline font-mono">Open Pass Page ↗</a></p>
             </div>
 
             <button
               onClick={() => setShowQrModal(false)}
-              className="w-full py-3 rounded-xl text-xs font-semibold bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm"
+              className="w-full py-3 rounded-xl text-xs font-semibold bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm hover:opacity-90 transition-opacity"
             >
-              Close
+              Done
             </button>
           </div>
         </div>

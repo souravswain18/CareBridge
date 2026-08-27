@@ -227,6 +227,27 @@ export const EmergencyHealthCard = () => {
               )}
             </div>
 
+            {/* Scannable Emergency ID Badge */}
+            <div className="p-6 rounded-3xl bg-slate-900 text-white dark:bg-slate-800/90 border border-slate-700 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
+              <div className="space-y-2 text-center sm:text-left">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                  DIGITAL TRIAGE BADGE
+                </span>
+                <h4 className="text-base font-bold">Shareable Scannable Pass</h4>
+                <p className="text-xs text-slate-400 max-w-sm">
+                  First responders, EMTs or caregivers can scan this QR code directly to access this verified clinical snapshot instantly.
+                </p>
+              </div>
+
+              <div className="p-2.5 bg-white rounded-2xl shadow-lg shrink-0">
+                <img 
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(window.location.href)}&color=0f172a`} 
+                  alt="Scannable Emergency QR" 
+                  className="w-24 h-24 object-contain rounded-lg"
+                />
+              </div>
+            </div>
+
           </div>
 
         </div>
