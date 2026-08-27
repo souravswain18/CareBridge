@@ -336,6 +336,10 @@ export const CaregiverDashboard = () => {
         /* Main Caregiver Grid */
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
+          {/* Left Column (7 Cols): Remote Vitals Telemetry */}
+          <div className="lg:col-span-7 space-y-8">
+            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-white/80 dark:border-slate-800 shadow-xl shadow-slate-900/5 space-y-6">
+
               {/* Clean Mobile-Responsive Telemetry Header */}
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-100 dark:border-slate-800/80">
                 <div>
