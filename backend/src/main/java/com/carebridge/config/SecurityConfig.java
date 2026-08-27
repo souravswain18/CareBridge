@@ -23,7 +23,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers( /api/health, /api/health/**, /api/emergency/**, /api/ai/**, /api/auth/**).permitAll()
+                .requestMatchers("/api/health", "/api/health/**", "/api/emergency/**", "/api/ai/**", "/api/auth/**").permitAll()
                 .anyRequest().permitAll()
             );
 
@@ -33,13 +33,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of(*));
-        configuration.setAllowedMethods(List.of(GET, POST, PUT, DELETE, OPTIONS, PATCH));
-        configuration.setAllowedHeaders(List.of(*));
+        configuration.setAllowedOriginPatterns(List.of("*"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration(/**, configuration);
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 }

@@ -9,16 +9,16 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
-@RequestMapping(/api/caregiver)
+@RequestMapping("/api/caregiver")
 @RequiredArgsConstructor
-@CrossOrigin(origins = *)
+@CrossOrigin(origins = "*")
 public class CaregiverSyncController {
 
     private final PatientProfileRepository patientProfileRepository;
     private final ReminderRepository reminderRepository;
     private final VitalsLogRepository vitalsLogRepository;
 
-    @GetMapping(/patient/{linkCode}/telemetry)
+    @GetMapping("/patient/{linkCode}/telemetry")
     public ResponseEntity<?> getPatientTelemetry(@PathVariable String linkCode) {
         Optional<PatientProfile> profileOpt = patientProfileRepository.findByLinkCode(linkCode);
         if (profileOpt.isEmpty()) {
@@ -36,15 +36,15 @@ public class CaregiverSyncController {
         List<VitalsLog> vitals = vitalsLogRepository.findByPatientIdOrderByTimestampAsc(patientUserId);
 
         Map<String, Object> result = new HashMap<>();
-        result.put(patientId, patientUserId);
-        result.put(name, profile.getUser().getName());
-        result.put(email, profile.getUser().getEmail());
-        result.put(bloodGroup, profile.getBloodGroup());
-        result.put(allergies, profile.getAllergies());
-        result.put(condition, profile.getChronicConditions());
-        result.put(caregiverPhone, profile.getEmergencyContactPhone());
-        result.put(reminders, reminders);
-        result.put(vitals, vitals);
+        result.put("patientId", patientUserId);
+        result.put("name", profile.getUser().getName());
+        result.put("email", profile.getUser().getEmail());
+        result.put("bloodGroup", profile.getBloodGroup());
+        result.put("allergies", profile.getAllergies());
+        result.put("condition", profile.getChronicConditions());
+        result.put("caregiverPhone", profile.getEmergencyContactPhone());
+        result.put("reminders", reminders);
+        result.put("vitals", vitals);
 
         return ResponseEntity.ok(result);
     }
