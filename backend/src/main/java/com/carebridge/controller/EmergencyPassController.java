@@ -1,4 +1,4 @@
-﻿package com.carebridge.controller;
+package com.carebridge.controller;
 
 import com.carebridge.model.PatientProfile;
 import com.carebridge.model.Reminder;

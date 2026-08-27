@@ -1,4 +1,4 @@
-﻿package com.carebridge.model;
+package com.carebridge.model;
 
 import jakarta.persistence.*;
 import lombok.*;

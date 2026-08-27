@@ -1,4 +1,4 @@
-﻿package com.carebridge.repository;
+package com.carebridge.repository;
 
 import com.carebridge.model.Reminder;
 import org.springframework.data.jpa.repository.JpaRepository;

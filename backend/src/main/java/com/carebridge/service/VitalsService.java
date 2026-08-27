@@ -1,4 +1,4 @@
-﻿package com.carebridge.service;
+package com.carebridge.service;
 
 import com.carebridge.model.VitalsLog;
 import com.carebridge.model.PatientProfile;

@@ -1,4 +1,4 @@
-﻿package com.carebridge.config;
+package com.carebridge.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
