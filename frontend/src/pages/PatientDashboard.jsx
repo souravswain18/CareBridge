@@ -29,9 +29,11 @@ export const PatientDashboard = () => {
     };
   });
 
-  const [editBloodGroup, setEditBloodGroup] = useState(profile.bloodGroup);
+  const [editBloodGroup, setEditBloodGroup] = useState(profile.bloodGroup || 'Not Specified');
   const [editAllergies, setEditAllergies] = useState(profile.allergies === 'None Reported' ? '' : profile.allergies);
   const [editCondition, setEditCondition] = useState(profile.condition === 'Post-Discharge Recovery' ? '' : profile.condition);
+  const [editGuardianName, setEditGuardianName] = useState(profile.caregiverName === 'Not Linked Yet' ? '' : profile.caregiverName);
+  const [editGuardianPhone, setEditGuardianPhone] = useState(profile.caregiverPhone === 'No Phone Linked' ? '' : profile.caregiverPhone);
 
   const handleSaveProfile = (e) => {
     e.preventDefault();
@@ -39,10 +41,14 @@ export const PatientDashboard = () => {
       ...profile,
       bloodGroup: editBloodGroup || 'Not Specified',
       allergies: editAllergies.trim() || 'None Reported',
-      condition: editCondition.trim() || 'Post-Discharge Recovery'
+      condition: editCondition.trim() || 'Post-Discharge Recovery',
+      caregiverName: editGuardianName.trim() || profile.caregiverName || 'Primary Guardian',
+      caregiverPhone: editGuardianPhone.trim() || profile.caregiverPhone || '+91 98765 43210'
     };
     setProfile(updated);
-    localStorage.setItem(`carebridge_profile_${user?.email}`, JSON.stringify(updated));
+    if (user?.email) {
+      localStorage.setItem(`carebridge_profile_${user.email}`, JSON.stringify(updated));
+    }
     setShowProfileModal(false);
   };
 
@@ -243,14 +249,32 @@ export const PatientDashboard = () => {
                 />
               </div>
 
-              {/* Primary Caregiver Connection Status Info */}
-              <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-600 dark:text-slate-300 space-y-1">
-                <span className="font-bold text-indigo-600 dark:text-indigo-400">Connected Caregiver Guardian:</span>
-                <p>
-                  {profile.caregiverName !== 'Not Linked Yet' 
-                    ? `✓ Linked: ${profile.caregiverName} (${profile.caregiverPhone})` 
-                    : '⏳ Not connected yet. Will automatically show once Caregiver enters your Link Code.'}
-                </p>
+              {/* Emergency Guardian Contact */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Guardian Name
+                  </label>
+                  <input
+                    type="text"
+                    value={editGuardianName}
+                    onChange={(e) => setEditGuardianName(e.target.value)}
+                    placeholder="e.g. Priya Sharma"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-800"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Guardian Phone (SOS)
+                  </label>
+                  <input
+                    type="tel"
+                    value={editGuardianPhone}
+                    onChange={(e) => setEditGuardianPhone(e.target.value)}
+                    placeholder="e.g. +91 98765 43210"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-800"
+                  />
+                </div>
               </div>
 
               <div className="flex space-x-3 pt-2">
