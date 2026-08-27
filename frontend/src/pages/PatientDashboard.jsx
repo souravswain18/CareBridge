@@ -285,19 +285,36 @@ export const PatientDashboard = () => {
               </button>
             </div>
 
-            {/* Scannable Live QR Code */}
-            <div className="flex flex-col items-center justify-center p-5 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
-              <div className="p-3 bg-white rounded-2xl shadow-md border border-slate-200">
-                <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(window.location.origin + '/emergency/CB-' + (user?.id ? String(user.id).slice(-4) : '7821'))}&color=0f172a`} 
-                  alt="Emergency Medical QR Pass" 
-                  className="w-40 h-40 object-contain rounded-lg"
-                />
-              </div>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                Scan with any smartphone camera to open emergency snapshot
-              </p>
-            </div>
+            {/* Scannable Live QR Code with Dynamic Payload Encoding */}
+            {(() => {
+              const qrPayload = {
+                n: user?.name || profile.name,
+                bg: profile.bloodGroup || 'Not Specified',
+                al: profile.allergies || 'None Reported',
+                cd: profile.condition || 'Post-Hospital Recovery',
+                cn: profile.caregiverName || 'Primary Guardian',
+                cp: profile.caregiverPhone || '+91 98765 43210',
+                m: (reminders || []).slice(0, 6).map(r => ({ n: r.name, t: r.time, d: r.dosage, tk: r.taken }))
+              };
+              const encodedData = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(qrPayload)))));
+              const targetUrl = `${window.location.origin}/emergency/CB-${user?.id ? String(user.id).slice(-4) : '7821'}?p=${encodedData}`;
+              const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(targetUrl)}&color=0f172a`;
+
+              return (
+                <div className="flex flex-col items-center justify-center p-5 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
+                  <div className="p-3 bg-white rounded-2xl shadow-md border border-slate-200">
+                    <img 
+                      src={qrApiUrl} 
+                      alt="Emergency Medical QR Pass" 
+                      className="w-44 h-44 object-contain rounded-lg"
+                    />
+                  </div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                    Scan with any smartphone camera to open your real emergency snapshot
+                  </p>
+                </div>
+              );
+            })()}
 
             <div className="space-y-1.5 text-left bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl text-xs text-slate-700 dark:text-slate-300">
               <p><strong>Patient:</strong> {user?.name}</p>

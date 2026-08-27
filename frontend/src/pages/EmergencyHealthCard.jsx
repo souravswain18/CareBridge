@@ -25,6 +25,34 @@ export const EmergencyHealthCard = () => {
 
   // Dynamic Patient Profile & Meds Resolution
   const [patientData, setPatientData] = useState(() => {
+    // 1. Check if URL has Encoded Real-time QR Payload
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const encodedPayload = urlParams.get('p');
+      if (encodedPayload) {
+        const decoded = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(encodedPayload)))));
+        if (decoded && decoded.n) {
+          return {
+            name: decoded.n,
+            bloodGroup: decoded.bg || 'Not Specified',
+            allergies: decoded.al || 'None Reported',
+            condition: decoded.cd || 'Post-Hospital Recovery',
+            caregiverName: decoded.cn || 'Primary Guardian',
+            caregiverPhone: decoded.cp || '+91 98765 43210',
+            reminders: (decoded.m || []).map((med, idx) => ({
+              id: String(idx + 1),
+              name: med.n,
+              time: med.t,
+              dosage: med.d,
+              taken: med.tk
+            }))
+          };
+        }
+      }
+    } catch (e) {
+      console.log('Payload decoding note:', e);
+    }
+
     const loggedUser = JSON.parse(localStorage.getItem('carebridge_user') || '{}');
     const email = loggedUser.email || 'patient';
     
