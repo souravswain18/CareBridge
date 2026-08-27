@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { APP_CONFIG } from '../config';
 import { 
   ShieldAlert, 
   HeartPulse, 
@@ -20,34 +21,56 @@ import {
 export const EmergencyHealthCard = () => {
   const { qrToken } = useParams();
   const [activeTab, setActiveTab] = useState('SNAPSHOT'); // 'SNAPSHOT' or 'HOSPITALS'
+  const [loading, setLoading] = useState(false);
 
   // Dynamic Patient Profile & Meds Resolution
   const [patientData, setPatientData] = useState(() => {
-    // 1. Check logged-in user or stored token profile
     const loggedUser = JSON.parse(localStorage.getItem('carebridge_user') || '{}');
     const email = loggedUser.email || 'patient';
     
     const savedReminders = JSON.parse(localStorage.getItem(`carebridge_reminders_${email}`) || '[]');
     const savedProfile = JSON.parse(localStorage.getItem(`carebridge_profile_${email}`) || '{}');
     
-    // Default seed data for public mobile scans without local session
-    const defaultReminders = [
-      { id: '1', name: 'Pan 40 (Pantoprazole)', time: '08:00 AM', dosage: '40mg • Before Breakfast', taken: true },
-      { id: '2', name: 'Telmisartan BP Guard', time: '09:00 AM', dosage: '40mg • Post Breakfast', taken: true },
-      { id: '3', name: 'Paracetamol / Dolo 650', time: '02:00 PM', dosage: '650mg • Post Lunch', taken: false },
-      { id: '4', name: 'Metformin Sugar Care', time: '08:30 PM', dosage: '500mg • Post Dinner', taken: false }
-    ];
-
     return {
-      name: loggedUser.name || savedProfile.name || 'Ramesh Kumar (Patient)',
-      bloodGroup: savedProfile.bloodGroup || 'O +ve (Positive)',
-      allergies: savedProfile.allergies || 'Penicillin, Sulfa Drugs',
-      caregiverName: savedProfile.caregiverName || 'Priya Sharma (Daughter)',
+      name: loggedUser.name || savedProfile.name || 'Active Patient',
+      bloodGroup: savedProfile.bloodGroup || 'O +ve',
+      allergies: savedProfile.allergies || 'None Reported',
+      caregiverName: savedProfile.caregiverName || 'Primary Guardian',
       caregiverPhone: savedProfile.caregiverPhone || '+91 98765 43210',
-      condition: savedProfile.condition || 'Post-Op Knee Arthroplasty • Stage 2 Cardiac Recovery',
-      reminders: savedReminders.length > 0 ? savedReminders : defaultReminders
+      condition: savedProfile.condition || 'Continuous Post-Discharge Recovery',
+      reminders: savedReminders
     };
   });
+
+  // 🌐 Live Backend Cloud Sync
+  useEffect(() => {
+    const token = qrToken || 'CB-7821';
+    const fetchLiveEmergencyData = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${APP_CONFIG.apiUrl}/emergency/${token}`);
+        if (res.ok) {
+          const liveData = await res.json();
+          setPatientData(prev => ({
+            ...prev,
+            name: liveData.name || prev.name,
+            bloodGroup: liveData.bloodGroup || prev.bloodGroup,
+            allergies: liveData.allergies || prev.allergies,
+            condition: liveData.condition || prev.condition,
+            caregiverName: liveData.caregiverName || prev.caregiverName,
+            caregiverPhone: liveData.caregiverPhone || prev.caregiverPhone,
+            reminders: liveData.reminders && liveData.reminders.length > 0 ? liveData.reminders : prev.reminders
+          }));
+        }
+      } catch (err) {
+        console.log('Live backend sync note: using secure client cache fallback');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLiveEmergencyData();
+  }, [qrToken]);
 
   // Nearby Verified Emergency Trauma Centers
   const NEARBY_HOSPITALS = [
