@@ -111,17 +111,32 @@ export const CaregiverDashboard = () => {
           const res = await fetch(`${APP_CONFIG.apiUrl}/caregiver/patient/${code}/telemetry`);
           if (res.ok) {
             const data = await res.json();
+            
+            // Sync Reminders
             if (data.reminders && Array.isArray(data.reminders)) {
               setPatientReminders(data.reminders);
               localStorage.setItem(`carebridge_reminders_${currentPatient.email}`, JSON.stringify(data.reminders));
+              if (data.email) {
+                localStorage.setItem(`carebridge_reminders_${data.email}`, JSON.stringify(data.reminders));
+              }
             }
+            
+            // Sync Vitals
             if (data.vitals && Array.isArray(data.vitals)) {
               setPatientVitals(data.vitals);
               localStorage.setItem(`carebridge_vitals_${currentPatient.email}`, JSON.stringify(data.vitals));
+              if (data.email) {
+                localStorage.setItem(`carebridge_vitals_${data.email}`, JSON.stringify(data.vitals));
+              }
             }
+            
+            // Sync Milestones
             if (data.milestones && Array.isArray(data.milestones) && data.milestones.length > 0) {
               setPatientMilestones(data.milestones);
               localStorage.setItem(`carebridge_milestones_${currentPatient.email}`, JSON.stringify(data.milestones));
+              if (data.email) {
+                localStorage.setItem(`carebridge_milestones_${data.email}`, JSON.stringify(data.milestones));
+              }
             }
           }
         } catch (e) {
