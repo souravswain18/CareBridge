@@ -74,11 +74,12 @@ public class GeminiAiService {
         }
 
         try {
-            String[] candidateModels = {
-                "gemini-1.5-flash-latest",
-                "gemini-1.5-flash",
-                "gemini-pro",
-                "gemini-1.5-pro-latest"
+            String[] modelEndpoints = {
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent",
+                "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-001:generateContent",
+                "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent"
             };
 
             String systemPrompt = "You are 'CareBot AI', an intelligent, empathetic, and multi-talented All-Rounder AI Companion & Recovery Assistant for Nivaan in India.\n"
@@ -100,9 +101,9 @@ public class GeminiAiService {
 
             StringBuilder errorLog = new StringBuilder();
 
-            for (String modelName : candidateModels) {
+            for (String endpoint : modelEndpoints) {
                 try {
-                    String url = "https://generativelanguage.googleapis.com/v1beta/models/" + modelName + ":generateContent?key=" + apiKey.trim();
+                    String url = endpoint + "?key=" + apiKey.trim();
                     ResponseEntity<Map> response = restTemplate.postForEntity(url, entity, Map.class);
                     
                     if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
