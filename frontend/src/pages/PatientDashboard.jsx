@@ -100,13 +100,15 @@ export const PatientDashboard = () => {
     }
   }, [user?.email]);
 
-  // Real-Time Cloud Sync: Push patient state to cloud backend
+  // Real-Time Continuous Cloud Sync Heartbeat: Push patient state to cloud backend continuously
   useEffect(() => {
-    if (user?.email) {
-      localStorage.setItem(`carebridge_reminders_${user.email}`, JSON.stringify(reminders));
-      localStorage.setItem(`carebridge_vitals_${user.email}`, JSON.stringify(vitalsData));
-      
-      const linkCode = `CB-${user?.id ? String(user.id).slice(-4) : '7821'}`;
+    if (!user?.email) return;
+
+    localStorage.setItem(`carebridge_reminders_${user.email}`, JSON.stringify(reminders));
+    localStorage.setItem(`carebridge_vitals_${user.email}`, JSON.stringify(vitalsData));
+    
+    const linkCode = `CB-${user?.id ? String(user.id).slice(-4) : '7821'}`;
+    const pushSync = () => {
       fetch(`${APP_CONFIG.apiUrl}/caregiver/sync`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -123,7 +125,11 @@ export const PatientDashboard = () => {
           milestones
         })
       }).catch(err => console.log('Live cloud sync heartbeat active.'));
-    }
+    };
+
+    pushSync();
+    const heartbeat = setInterval(pushSync, 2000); // Continuous 2s heartbeat
+    return () => clearInterval(heartbeat);
   }, [reminders, vitalsData, profile, milestones, user]);
 
   const handleToggleComplete = (id) => {
