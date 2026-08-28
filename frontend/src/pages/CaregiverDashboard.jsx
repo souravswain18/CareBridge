@@ -88,25 +88,7 @@ export const CaregiverDashboard = () => {
 
   useEffect(() => {
     if (currentPatient) {
-      // 1. Initial Local Cache Load
-      const savedReminders = localStorage.getItem(`carebridge_reminders_${currentPatient.email}`);
-      setPatientReminders(savedReminders ? JSON.parse(savedReminders) : []);
-
-      const savedVitals = localStorage.getItem(`carebridge_vitals_${currentPatient.email}`);
-      setPatientVitals(savedVitals ? JSON.parse(savedVitals) : []);
-
-      const savedMilestones = localStorage.getItem(`carebridge_milestones_${currentPatient.email}`);
-      setPatientMilestones(savedMilestones ? JSON.parse(savedMilestones) : [
-        {
-          id: 1,
-          dayTag: 'DAY 0',
-          title: 'Hospital Discharge & Home Recovery Start',
-          description: 'Initial recovery profile created. Start your daily prescribed routine.',
-          completed: true
-        }
-      ]);
-
-      // 2. Live Cloud Database Telemetry Sync
+      // 1. Live Cloud Database Telemetry Sync (Primary Source of Truth)
       const fetchLiveTelemetry = async () => {
         try {
           const code = currentPatient.linkCode || 'CB-7821';
@@ -115,30 +97,18 @@ export const CaregiverDashboard = () => {
             const data = await res.json();
             
             // Sync Reminders
-            if (data.reminders && Array.isArray(data.reminders)) {
-              setPatientReminders(data.reminders);
-              localStorage.setItem(`carebridge_reminders_${currentPatient.email}`, JSON.stringify(data.reminders));
-              if (data.email) {
-                localStorage.setItem(`carebridge_reminders_${data.email}`, JSON.stringify(data.reminders));
-              }
+            if (data.reminders && Array.isArray(data.reminders) && data.reminders.length > 0) {
+              setPatientReminders([...data.reminders]);
             }
             
             // Sync Vitals
-            if (data.vitals && Array.isArray(data.vitals)) {
-              setPatientVitals(data.vitals);
-              localStorage.setItem(`carebridge_vitals_${currentPatient.email}`, JSON.stringify(data.vitals));
-              if (data.email) {
-                localStorage.setItem(`carebridge_vitals_${data.email}`, JSON.stringify(data.vitals));
-              }
+            if (data.vitals && Array.isArray(data.vitals) && data.vitals.length > 0) {
+              setPatientVitals([...data.vitals]);
             }
             
             // Sync Milestones
             if (data.milestones && Array.isArray(data.milestones) && data.milestones.length > 0) {
-              setPatientMilestones(data.milestones);
-              localStorage.setItem(`carebridge_milestones_${currentPatient.email}`, JSON.stringify(data.milestones));
-              if (data.email) {
-                localStorage.setItem(`carebridge_milestones_${data.email}`, JSON.stringify(data.milestones));
-              }
+              setPatientMilestones([...data.milestones]);
             }
           }
         } catch (e) {
@@ -147,7 +117,7 @@ export const CaregiverDashboard = () => {
       };
 
       fetchLiveTelemetry();
-      const interval = setInterval(fetchLiveTelemetry, 2500); // Polling every 2.5s for instant live telemetry
+      const interval = setInterval(fetchLiveTelemetry, 2000); // Polling every 2s for instant live updates
       return () => clearInterval(interval);
     } else {
       setPatientReminders([]);
