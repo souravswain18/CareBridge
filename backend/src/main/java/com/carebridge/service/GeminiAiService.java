@@ -74,8 +74,12 @@ public class GeminiAiService {
         }
 
         try {
-            // Google Gemini API Model
-            String geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey.trim();
+            String[] candidateModels = {
+                "gemini-1.5-flash-latest",
+                "gemini-1.5-flash",
+                "gemini-pro",
+                "gemini-1.5-pro-latest"
+            };
 
             String systemPrompt = "You are 'CareBot AI', an intelligent, empathetic, and multi-talented All-Rounder AI Companion & Recovery Assistant for Nivaan in India.\n"
                     + "YOUR SUPERPOWERS & PERSONALITY:\n"
@@ -92,29 +96,28 @@ public class GeminiAiService {
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-            
-            ResponseEntity<Map> response;
-            try {
-                response = restTemplate.postForEntity(geminiUrl, entity, Map.class);
-            } catch (Exception err) {
-                // Fallback to gemini-1.5-flash if 2.5 is not accessible
-                String fallbackUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey.trim();
-                response = restTemplate.postForEntity(fallbackUrl, entity, Map.class);
-            }
 
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                Map body = response.getBody();
-                List candidates = (List) body.get("candidates");
-                if (candidates != null && !candidates.isEmpty()) {
-                    Map firstCandidate = (Map) candidates.get(0);
-                    Map content = (Map) firstCandidate.get("content");
-                    List resParts = (List) content.get("parts");
-                    if (resParts != null && !resParts.isEmpty()) {
-                        Map firstPart = (Map) resParts.get(0);
-                        return (String) firstPart.get("text");
+            for (String modelName : candidateModels) {
+                try {
+                    String url = "https://generativelanguage.googleapis.com/v1beta/models/" + modelName + ":generateContent?key=" + apiKey.trim();
+                    ResponseEntity<Map> response = restTemplate.postForEntity(url, entity, Map.class);
+                    
+                    if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                        Map body = response.getBody();
+                        List candidates = (List) body.get("candidates");
+                        if (candidates != null && !candidates.isEmpty()) {
+                            Map firstCandidate = (Map) candidates.get(0);
+                            Map content = (Map) firstCandidate.get("content");
+                            List resParts = (List) content.get("parts");
+                            if (resParts != null && !resParts.isEmpty()) {
+                                Map firstPart = (Map) resParts.get(0);
+                                return (String) firstPart.get("text");
+                            }
+                        }
                     }
+                } catch (Exception ignored) {
+                    // Try next model candidate
                 }
             }
             return "I am here to help you recover comfortably. For specific clinical concerns, always confirm with your attending physician.";
