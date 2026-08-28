@@ -87,40 +87,40 @@ export const CaregiverDashboard = () => {
   const [newMilestoneDesc, setNewMilestoneDesc] = useState('');
 
   useEffect(() => {
-    if (currentPatient) {
-      const code = currentPatient.linkCode || 'CB-7821';
+    if (!currentPatient) return;
+    const code = currentPatient.linkCode || 'CB-7821';
 
-      // 1. Immediate Instant Cloud Fetch
-      const fetchLiveTelemetry = async () => {
-        try {
-          const res = await fetch(`${APP_CONFIG.apiUrl}/caregiver/patient/${code}/telemetry`);
-          if (res.ok) {
-            const data = await res.json();
-            
-            // Sync Reminders
-            if (data.reminders && Array.isArray(data.reminders)) {
-              setPatientReminders([...data.reminders]);
-            }
-            
-            // Sync Vitals
-            if (data.vitals && Array.isArray(data.vitals)) {
-              setPatientVitals([...data.vitals]);
-            }
-            
-            // Sync Milestones
-            if (data.milestones && Array.isArray(data.milestones)) {
-              setPatientMilestones([...data.milestones]);
-            }
+    let isMounted = true;
+
+    const fetchLiveTelemetry = async () => {
+      try {
+        const res = await fetch(`${APP_CONFIG.apiUrl}/caregiver/patient/${code}/telemetry`);
+        if (res.ok && isMounted) {
+          const data = await res.json();
+          
+          if (Array.isArray(data.reminders)) {
+            setPatientReminders(data.reminders);
           }
-        } catch (e) {
-          console.log('Live cloud sync note:', e);
+          
+          if (Array.isArray(data.vitals)) {
+            setPatientVitals(data.vitals);
+          }
+          
+          if (Array.isArray(data.milestones)) {
+            setPatientMilestones(data.milestones);
+          }
         }
-      };
+      } catch (e) {
+        console.error('Telemetry fetch error:', e);
+      }
+    };
 
-      fetchLiveTelemetry();
-      const interval = setInterval(fetchLiveTelemetry, 1500); // Polling every 1.5s for instant live telemetry
-      return () => clearInterval(interval);
-    }
+    fetchLiveTelemetry();
+    const interval = setInterval(fetchLiveTelemetry, 1500);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, [currentPatient?.linkCode, currentPatient?.id, selectedPatientId]);
 
   const handleAddMilestone = (e) => {
