@@ -122,7 +122,7 @@ public class GeminiAiService {
                         }
                     }
                 } catch (Exception modelErr) {
-                    errorLog.append("[").append(modelName).append(": ").append(modelErr.getMessage()).append("] ");
+                    errorLog.append("[").append(endpoint.substring(endpoint.lastIndexOf('/') + 1)).append(": ").append(modelErr.getMessage()).append("] ");
                 }
             }
             return "CareBot AI Diagnostics: " + errorLog.toString();
