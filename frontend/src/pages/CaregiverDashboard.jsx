@@ -43,6 +43,7 @@ export const CaregiverDashboard = () => {
   const [showAddMilestoneModal, setShowAddMilestoneModal] = useState(false);
   const [showCallModal, setShowCallModal] = useState(false);
   const [pingSent, setPingSent] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [patientNameInput, setPatientNameInput] = useState('');
   const [linkCodeInput, setLinkCodeInput] = useState('');
   const [activeTab, setActiveTab] = useState('BP'); // 'BP' or 'SUGAR'
@@ -358,20 +359,35 @@ export const CaregiverDashboard = () => {
                     onClick={async () => {
                       if (!currentPatient) return;
                       const code = currentPatient.linkCode || 'CB-7821';
+                      setIsRefreshing(true);
                       try {
                         const res = await fetch(`${APP_CONFIG.apiUrl}/caregiver/patient/${code}/telemetry`);
                         if (res.ok) {
                           const data = await res.json();
-                          if (data.reminders) setPatientReminders(data.reminders);
-                          if (data.vitals) setPatientVitals(data.vitals);
-                          if (data.milestones) setPatientMilestones(data.milestones);
+                          if (data.reminders && Array.isArray(data.reminders)) {
+                            setPatientReminders([...data.reminders]);
+                          }
+                          if (data.vitals && Array.isArray(data.vitals)) {
+                            setPatientVitals([...data.vitals]);
+                          }
+                          if (data.milestones && Array.isArray(data.milestones)) {
+                            setPatientMilestones([...data.milestones]);
+                          }
                         }
-                      } catch(e) {}
+                      } catch(e) {
+                        console.log('Refresh error:', e);
+                      } finally {
+                        setTimeout(() => setIsRefreshing(false), 500);
+                      }
                     }}
-                    className="p-2.5 text-slate-600 dark:text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 rounded-xl transition-colors border border-slate-200 dark:border-slate-700 shrink-0"
+                    className={`p-2.5 rounded-xl transition-all border border-slate-200 dark:border-slate-700 shrink-0 ${
+                      isRefreshing 
+                        ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-300' 
+                        : 'text-slate-600 dark:text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/40'
+                    }`}
                     title="Live Refresh Cloud Telemetry"
                   >
-                    <RefreshCw className="w-4 h-4" />
+                    <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-indigo-600' : ''}`} />
                   </button>
 
                   <button
