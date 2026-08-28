@@ -136,6 +136,27 @@ export const CaregiverDashboard = () => {
     };
   }, [currentPatient?.linkCode, currentPatient?.id, selectedPatientId]);
 
+  const pushCaregiverUpdatesToCloud = async (updatedReminders, updatedMilestones) => {
+    if (!currentPatient) return;
+    const code = currentPatient.linkCode || 'CB-7821';
+    try {
+      await fetch(`${APP_CONFIG.apiUrl}/caregiver/sync`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          linkCode: code,
+          email: currentPatient.email,
+          name: currentPatient.name,
+          reminders: updatedReminders !== undefined ? updatedReminders : patientReminders,
+          vitals: patientVitals,
+          milestones: updatedMilestones !== undefined ? updatedMilestones : patientMilestones
+        })
+      });
+    } catch (e) {
+      console.log('Push caregiver update note:', e);
+    }
+  };
+
   const handleAddMilestone = (e) => {
     e.preventDefault();
     if (!newMilestoneTitle.trim() || !currentPatient) return;
@@ -150,7 +171,7 @@ export const CaregiverDashboard = () => {
 
     const updated = [...patientMilestones, newM];
     setPatientMilestones(updated);
-    localStorage.setItem(`carebridge_milestones_${currentPatient.email}`, JSON.stringify(updated));
+    pushCaregiverUpdatesToCloud(patientReminders, updated);
 
     setNewMilestoneTitle('');
     setNewMilestoneDesc('');
@@ -163,14 +184,14 @@ export const CaregiverDashboard = () => {
       m.id === id ? { ...m, completed: !m.completed } : m
     );
     setPatientMilestones(updated);
-    localStorage.setItem(`carebridge_milestones_${currentPatient.email}`, JSON.stringify(updated));
+    pushCaregiverUpdatesToCloud(patientReminders, updated);
   };
 
   const handleDeleteMilestone = (id) => {
     if (!currentPatient) return;
     const updated = patientMilestones.filter(m => m.id !== id);
     setPatientMilestones(updated);
-    localStorage.setItem(`carebridge_milestones_${currentPatient.email}`, JSON.stringify(updated));
+    pushCaregiverUpdatesToCloud(patientReminders, updated);
   };
 
   // New Task State
@@ -221,7 +242,7 @@ export const CaregiverDashboard = () => {
 
     const updated = [newTask, ...patientReminders];
     setPatientReminders(updated);
-    localStorage.setItem(`carebridge_reminders_${currentPatient.email}`, JSON.stringify(updated));
+    pushCaregiverUpdatesToCloud(updated, patientMilestones);
 
     setNewTitle('');
     setNewDosage('');
