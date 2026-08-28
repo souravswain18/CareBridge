@@ -27,20 +27,22 @@ public class CaregiverSyncController {
         Map<String, Object> existing = LIVE_TELEMETRY.getOrDefault(key, new HashMap<>());
         Map<String, Object> merged = new HashMap<>(existing);
 
-        // Merge fields
         payload.forEach((k, v) -> {
             if (v != null) {
-                if ("milestones".equals(k)) {
-                    List<?> incomingM = (List<?>) v;
-                    List<?> existingM = (List<?>) existing.get("milestones");
-                    if (incomingM.size() >= (existingM != null ? existingM.size() : 0)) {
-                        merged.put("milestones", incomingM);
+                if ("vitals".equals(k)) {
+                    List<?> incoming = (List<?>) v;
+                    if (!incoming.isEmpty()) {
+                        merged.put("vitals", incoming);
                     }
                 } else if ("reminders".equals(k)) {
-                    List<?> incomingR = (List<?>) v;
-                    List<?> existingR = (List<?>) existing.get("reminders");
-                    if (incomingR.size() >= (existingR != null ? existingR.size() : 0)) {
-                        merged.put("reminders", incomingR);
+                    List<?> incoming = (List<?>) v;
+                    if (!incoming.isEmpty()) {
+                        merged.put("reminders", incoming);
+                    }
+                } else if ("milestones".equals(k)) {
+                    List<?> incoming = (List<?>) v;
+                    if (!incoming.isEmpty()) {
+                        merged.put("milestones", incoming);
                     }
                 } else {
                     merged.put(k, v);
