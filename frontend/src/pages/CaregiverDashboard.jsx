@@ -88,26 +88,27 @@ export const CaregiverDashboard = () => {
 
   useEffect(() => {
     if (currentPatient) {
-      // 1. Live Cloud Database Telemetry Sync (Primary Source of Truth)
+      const code = currentPatient.linkCode || 'CB-7821';
+
+      // 1. Immediate Instant Cloud Fetch
       const fetchLiveTelemetry = async () => {
         try {
-          const code = currentPatient.linkCode || 'CB-7821';
           const res = await fetch(`${APP_CONFIG.apiUrl}/caregiver/patient/${code}/telemetry`);
           if (res.ok) {
             const data = await res.json();
             
             // Sync Reminders
-            if (data.reminders && Array.isArray(data.reminders) && data.reminders.length > 0) {
+            if (data.reminders && Array.isArray(data.reminders)) {
               setPatientReminders([...data.reminders]);
             }
             
             // Sync Vitals
-            if (data.vitals && Array.isArray(data.vitals) && data.vitals.length > 0) {
+            if (data.vitals && Array.isArray(data.vitals)) {
               setPatientVitals([...data.vitals]);
             }
             
             // Sync Milestones
-            if (data.milestones && Array.isArray(data.milestones) && data.milestones.length > 0) {
+            if (data.milestones && Array.isArray(data.milestones)) {
               setPatientMilestones([...data.milestones]);
             }
           }
@@ -117,14 +118,10 @@ export const CaregiverDashboard = () => {
       };
 
       fetchLiveTelemetry();
-      const interval = setInterval(fetchLiveTelemetry, 2000); // Polling every 2s for instant live updates
+      const interval = setInterval(fetchLiveTelemetry, 1500); // Polling every 1.5s for instant live telemetry
       return () => clearInterval(interval);
-    } else {
-      setPatientReminders([]);
-      setPatientVitals([]);
-      setPatientMilestones([]);
     }
-  }, [currentPatient, selectedPatientId]);
+  }, [currentPatient?.linkCode, currentPatient?.id, selectedPatientId]);
 
   const handleAddMilestone = (e) => {
     e.preventDefault();
