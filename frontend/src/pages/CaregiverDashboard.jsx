@@ -295,8 +295,13 @@ export const CaregiverDashboard = () => {
                 Guardian Mode
               </span>
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-mono">
-              Caregiver: {user?.name} • Remote Telemetry Sync
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-mono flex items-center gap-2">
+              <span>Caregiver: {user?.name}</span>
+              {currentPatient && (
+                <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold border border-emerald-500/20">
+                  ● Live Feed: {currentPatient.linkCode} ({patientReminders.length} Meds, {patientVitals.length} Vitals)
+                </span>
+              )}
             </p>
           </div>
         </div>
