@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Check, 
   Clock, 
@@ -8,7 +8,11 @@ import {
   Inbox, 
   Sparkles, 
   Search,
-  Trash2
+  Trash2,
+  Bell,
+  Volume2,
+  VolumeX,
+  AlertTriangle
 } from 'lucide-react';
 import { MASTER_MEDICINES } from '../data/medicinesData';
 
@@ -22,6 +26,49 @@ export const MedicationChecklist = ({ reminders, onToggleComplete, onAddReminder
   const [newType, setNewType] = useState('MEDICINE');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [alarmActive, setAlarmActive] = useState(false);
+  const [alarmDismissed, setAlarmDismissed] = useState(false);
+
+  // Synthesized Web Audio API Beep Alarm (Works seamlessly on all browsers & phones without external audio files)
+  const playAlarmSound = () => {
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      const ctx = new AudioContext();
+      
+      const playBeep = (freq, start, duration) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.3, ctx.currentTime + start);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + start + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + start);
+        osc.stop(ctx.currentTime + start + duration);
+      };
+
+      // Medical pulse chime pattern (Beep-Beep-Beep)
+      playBeep(880, 0, 0.2);
+      playBeep(880, 0.25, 0.2);
+      playBeep(1046.5, 0.5, 0.4);
+    } catch (e) {
+      console.log('Audio chime note:', e);
+    }
+  };
+
+  // Check for missed / due reminders
+  const overdueCount = reminders.filter(r => !r.isCompleted).length;
+
+  useEffect(() => {
+    // If there are pending uncompleted reminders, sound the alert gently
+    if (overdueCount > 0 && !alarmDismissed) {
+      setAlarmActive(true);
+    } else {
+      setAlarmActive(false);
+    }
+  }, [overdueCount, alarmDismissed]);
 
   useEffect(() => {
     if (newTitle.trim().length > 0) {
@@ -87,6 +134,41 @@ export const MedicationChecklist = ({ reminders, onToggleComplete, onAddReminder
           <span>Add Task</span>
         </button>
       </div>
+
+      {/* Missed Medicine / Due Active Alarm Banner */}
+      {alarmActive && (
+        <div className="p-4 bg-rose-500/10 border-2 border-rose-500/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-pulse">
+          <div className="flex items-center space-x-3">
+            <div className="p-2.5 bg-rose-600 text-white rounded-xl shadow-md">
+              <Bell className="w-5 h-5 animate-bounce" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-rose-700 dark:text-rose-300">
+                🔔 Medication Alarm Due ({overdueCount} Pending Doses)
+              </h4>
+              <p className="text-xs text-rose-600/90 dark:text-rose-400">
+                20-min grace active. Please mark your doses as taken to prevent automated caregiver escalation!
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={playAlarmSound}
+              className="px-3.5 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition-all shadow-sm flex items-center space-x-1.5"
+            >
+              <Volume2 className="w-4 h-4" />
+              <span>Play Alarm</span>
+            </button>
+            <button
+              onClick={() => setAlarmDismissed(true)}
+              className="px-3 py-2 text-xs font-semibold text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-950/60 rounded-xl transition-all"
+            >
+              Snooze
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 20-Min Grace Explanation Pill */}
       <div className="p-3.5 bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 rounded-2xl flex items-center space-x-3 text-xs text-amber-900 dark:text-amber-200">

@@ -111,13 +111,17 @@ export const CaregiverDashboard = () => {
           const res = await fetch(`${APP_CONFIG.apiUrl}/caregiver/patient/${code}/telemetry`);
           if (res.ok) {
             const data = await res.json();
-            if (data.reminders && data.reminders.length > 0) {
+            if (data.reminders !== undefined) {
               setPatientReminders(data.reminders);
               localStorage.setItem(`carebridge_reminders_${currentPatient.email}`, JSON.stringify(data.reminders));
             }
-            if (data.vitals && data.vitals.length > 0) {
+            if (data.vitals !== undefined) {
               setPatientVitals(data.vitals);
               localStorage.setItem(`carebridge_vitals_${currentPatient.email}`, JSON.stringify(data.vitals));
+            }
+            if (data.milestones !== undefined && data.milestones.length > 0) {
+              setPatientMilestones(data.milestones);
+              localStorage.setItem(`carebridge_milestones_${currentPatient.email}`, JSON.stringify(data.milestones));
             }
           }
         } catch (e) {
@@ -126,7 +130,7 @@ export const CaregiverDashboard = () => {
       };
 
       fetchLiveTelemetry();
-      const interval = setInterval(fetchLiveTelemetry, 10000); // Polling every 10s for real-time live sync
+      const interval = setInterval(fetchLiveTelemetry, 3000); // Polling every 3s for instantaneous live sync
       return () => clearInterval(interval);
     } else {
       setPatientReminders([]);

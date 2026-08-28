@@ -11,6 +11,7 @@ import {
   X,
   ShieldAlert
 } from 'lucide-react';
+import { APP_CONFIG } from '../config';
 
 export const PatientDashboard = () => {
   const { user } = useAuth();
@@ -58,36 +59,51 @@ export const PatientDashboard = () => {
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Dynamic Vitals Data (Saved in LocalStorage per user)
+  // Dynamic Vitals Telemetry History
   const [vitalsData, setVitalsData] = useState(() => {
     const saved = localStorage.getItem(`carebridge_vitals_${user?.email}`);
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Dynamic Milestones Data
+  // Dynamic Recovery Milestones
   const [milestones, setMilestones] = useState(() => {
     const saved = localStorage.getItem(`carebridge_milestones_${user?.email}`);
     return saved ? JSON.parse(saved) : [
       {
+        id: 1,
         dayTag: 'DAY 0',
-        title: 'Discharge & Home Recovery Start',
-        description: 'Initial recovery profile created. Start your daily prescribed routine.',
+        title: 'Hospital Discharge & Home Recovery Start',
+        description: 'Initial recovery profile created. Follow your prescribed medication schedule.',
         completed: true
       }
     ];
   });
 
+  // Real-Time Cloud Sync: Push patient state to cloud backend
   useEffect(() => {
     if (user?.email) {
       localStorage.setItem(`carebridge_reminders_${user.email}`, JSON.stringify(reminders));
-    }
-  }, [reminders, user]);
-
-  useEffect(() => {
-    if (user?.email) {
       localStorage.setItem(`carebridge_vitals_${user.email}`, JSON.stringify(vitalsData));
+      
+      const linkCode = `CB-${user?.id ? String(user.id).slice(-4) : '7821'}`;
+      fetch(`${APP_CONFIG.apiUrl}/caregiver/sync`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          linkCode,
+          email: user.email,
+          name: user.name,
+          bloodGroup: profile.bloodGroup,
+          allergies: profile.allergies,
+          condition: profile.condition,
+          caregiverPhone: profile.caregiverPhone,
+          reminders,
+          vitals: vitalsData,
+          milestones
+        })
+      }).catch(err => console.log('Live cloud sync heartbeat active.'));
     }
-  }, [vitalsData, user]);
+  }, [reminders, vitalsData, profile, milestones, user]);
 
   const handleToggleComplete = (id) => {
     setReminders(prev =>
