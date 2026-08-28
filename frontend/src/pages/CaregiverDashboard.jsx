@@ -111,33 +111,33 @@ export const CaregiverDashboard = () => {
           const res = await fetch(`${APP_CONFIG.apiUrl}/caregiver/patient/${code}/telemetry`);
           if (res.ok) {
             const data = await res.json();
-            if (data.reminders !== undefined) {
+            if (data.reminders && Array.isArray(data.reminders)) {
               setPatientReminders(data.reminders);
               localStorage.setItem(`carebridge_reminders_${currentPatient.email}`, JSON.stringify(data.reminders));
             }
-            if (data.vitals !== undefined) {
+            if (data.vitals && Array.isArray(data.vitals)) {
               setPatientVitals(data.vitals);
               localStorage.setItem(`carebridge_vitals_${currentPatient.email}`, JSON.stringify(data.vitals));
             }
-            if (data.milestones !== undefined && data.milestones.length > 0) {
+            if (data.milestones && Array.isArray(data.milestones) && data.milestones.length > 0) {
               setPatientMilestones(data.milestones);
               localStorage.setItem(`carebridge_milestones_${currentPatient.email}`, JSON.stringify(data.milestones));
             }
           }
         } catch (e) {
-          console.log('Cloud sync note: using cached client telemetry');
+          console.log('Live cloud sync note:', e);
         }
       };
 
       fetchLiveTelemetry();
-      const interval = setInterval(fetchLiveTelemetry, 3000); // Polling every 3s for instantaneous live sync
+      const interval = setInterval(fetchLiveTelemetry, 2500); // Polling every 2.5s for instant live telemetry
       return () => clearInterval(interval);
     } else {
       setPatientReminders([]);
       setPatientVitals([]);
       setPatientMilestones([]);
     }
-  }, [currentPatient]);
+  }, [currentPatient, selectedPatientId]);
 
   const handleAddMilestone = (e) => {
     e.preventDefault();
