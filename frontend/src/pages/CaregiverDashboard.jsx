@@ -235,7 +235,11 @@ export const CaregiverDashboard = () => {
     e.preventDefault();
     if (!linkCodeInput.trim()) return;
 
-    const code = linkCodeInput.trim().toUpperCase();
+    let code = linkCodeInput.trim().toUpperCase();
+    if (!code.startsWith('CB-')) {
+      code = `CB-${code.replace(/[^0-9A-Z]/g, '')}`;
+    }
+
     const displayName = patientNameInput.trim() || `Patient (${code})`;
     const targetEmail = `patient.${code.toLowerCase()}@carebridge.com`;
     
