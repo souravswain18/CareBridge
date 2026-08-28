@@ -86,6 +86,8 @@ export const CaregiverDashboard = () => {
   const [newMilestoneTitle, setNewMilestoneTitle] = useState('');
   const [newMilestoneDesc, setNewMilestoneDesc] = useState('');
 
+  const [syncStatusText, setSyncStatusText] = useState('Connecting...');
+
   useEffect(() => {
     if (!currentPatient) return;
     const code = currentPatient.linkCode || 'CB-7821';
@@ -94,9 +96,11 @@ export const CaregiverDashboard = () => {
 
     const fetchLiveTelemetry = async () => {
       try {
-        const res = await fetch(`${APP_CONFIG.apiUrl}/caregiver/patient/${code}/telemetry`);
+        const url = `${APP_CONFIG.apiUrl}/caregiver/patient/${code}/telemetry`;
+        const res = await fetch(url);
         if (res.ok && isMounted) {
           const data = await res.json();
+          setSyncStatusText(`HTTP 200 OK (${data.reminders?.length || 0} Meds, ${data.vitals?.length || 0} Vitals)`);
           
           if (Array.isArray(data.reminders)) {
             setPatientReminders(data.reminders);
@@ -115,9 +119,11 @@ export const CaregiverDashboard = () => {
           if (Array.isArray(data.milestones)) {
             setPatientMilestones(data.milestones);
           }
+        } else {
+          setSyncStatusText(`HTTP ${res.status} Error`);
         }
       } catch (e) {
-        console.error('Telemetry fetch error:', e);
+        setSyncStatusText(`Network Error: ${e.message}`);
       }
     };
 
@@ -304,8 +310,8 @@ export const CaregiverDashboard = () => {
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-mono flex items-center gap-2">
               <span>Caregiver: {user?.name}</span>
               {currentPatient && (
-                <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold border border-emerald-500/20">
-                  ● Live Feed: {currentPatient.linkCode} ({patientReminders.length} Meds, {patientVitals.length} Vitals)
+                <span className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold border border-indigo-500/20">
+                  ● Status: {syncStatusText}
                 </span>
               )}
             </p>
