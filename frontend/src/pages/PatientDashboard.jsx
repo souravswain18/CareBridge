@@ -79,6 +79,27 @@ export const PatientDashboard = () => {
     ];
   });
 
+  // Initial fetch from cloud backend on mount
+  useEffect(() => {
+    if (user?.email) {
+      const linkCode = `CB-${user?.id ? String(user.id).slice(-4) : '7821'}`;
+      fetch(`${APP_CONFIG.apiUrl}/caregiver/patient/${linkCode}/telemetry`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.reminders && Array.isArray(data.reminders) && data.reminders.length > 0) {
+            setReminders(data.reminders);
+          }
+          if (data.vitals && Array.isArray(data.vitals) && data.vitals.length > 0) {
+            setVitalsData(data.vitals);
+          }
+          if (data.milestones && Array.isArray(data.milestones) && data.milestones.length > 0) {
+            setMilestones(data.milestones);
+          }
+        })
+        .catch(e => console.log('Initial cloud load note:', e));
+    }
+  }, [user?.email]);
+
   // Real-Time Cloud Sync: Push patient state to cloud backend
   useEffect(() => {
     if (user?.email) {
