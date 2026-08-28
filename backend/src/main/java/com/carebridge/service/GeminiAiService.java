@@ -98,6 +98,8 @@ public class GeminiAiService {
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
+            StringBuilder errorLog = new StringBuilder();
+
             for (String modelName : candidateModels) {
                 try {
                     String url = "https://generativelanguage.googleapis.com/v1beta/models/" + modelName + ":generateContent?key=" + apiKey.trim();
@@ -109,18 +111,20 @@ public class GeminiAiService {
                         if (candidates != null && !candidates.isEmpty()) {
                             Map firstCandidate = (Map) candidates.get(0);
                             Map content = (Map) firstCandidate.get("content");
-                            List resParts = (List) content.get("parts");
-                            if (resParts != null && !resParts.isEmpty()) {
-                                Map firstPart = (Map) resParts.get(0);
-                                return (String) firstPart.get("text");
+                            if (content != null) {
+                                List resParts = (List) content.get("parts");
+                                if (resParts != null && !resParts.isEmpty()) {
+                                    Map firstPart = (Map) resParts.get(0);
+                                    return (String) firstPart.get("text");
+                                }
                             }
                         }
                     }
-                } catch (Exception ignored) {
-                    // Try next model candidate
+                } catch (Exception modelErr) {
+                    errorLog.append("[").append(modelName).append(": ").append(modelErr.getMessage()).append("] ");
                 }
             }
-            return "I am here to help you recover comfortably. For specific clinical concerns, always confirm with your attending physician.";
+            return "CareBot AI Diagnostics: " + errorLog.toString();
         } catch (Exception e) {
             return "CareBot AI Note (" + e.getMessage() + "): Stay well hydrated, rest adequately, and take prescribed medicines at scheduled times.";
         }
