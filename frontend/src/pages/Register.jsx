@@ -55,6 +55,13 @@ export const Register = () => {
           </p>
         </div>
 
+        {/* Error Alert */}
+        {error && (
+          <div className="p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 rounded-xl text-xs font-semibold text-rose-700 dark:text-rose-400">
+            ⚠️ {error}
+          </div>
+        )}
+
         {/* Form */}
         <form className="space-y-4" onSubmit={handleSubmit}>
           
