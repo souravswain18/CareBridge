@@ -35,6 +35,7 @@ import {
   ReferenceLine 
 } from 'recharts';
 import { MASTER_MEDICINES } from '../data/medicinesData';
+import { APP_CONFIG } from '../config';
 
 export const CaregiverDashboard = () => {
   const { user } = useAuth();
