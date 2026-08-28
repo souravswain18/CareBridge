@@ -74,7 +74,8 @@ public class GeminiAiService {
         }
 
         try {
-            String geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
+            // Google Gemini API Model
+            String geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey.trim();
 
             String systemPrompt = "You are 'CareBot AI', an intelligent, empathetic, and multi-talented All-Rounder AI Companion & Recovery Assistant for Nivaan in India.\n"
                     + "YOUR SUPERPOWERS & PERSONALITY:\n"
@@ -93,7 +94,15 @@ public class GeminiAiService {
             headers.setContentType(MediaType.APPLICATION_JSON);
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-            ResponseEntity<Map> response = restTemplate.postForEntity(geminiUrl, entity, Map.class);
+            
+            ResponseEntity<Map> response;
+            try {
+                response = restTemplate.postForEntity(geminiUrl, entity, Map.class);
+            } catch (Exception err) {
+                // Fallback to gemini-1.5-flash if 2.5 is not accessible
+                String fallbackUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey.trim();
+                response = restTemplate.postForEntity(fallbackUrl, entity, Map.class);
+            }
 
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                 Map body = response.getBody();
@@ -110,7 +119,7 @@ public class GeminiAiService {
             }
             return "I am here to help you recover comfortably. For specific clinical concerns, always confirm with your attending physician.";
         } catch (Exception e) {
-            return "CareBot is currently operating in offline guidance mode: Stay well hydrated, rest adequately, and take prescribed medicines at the exact times marked in your checklist.";
+            return "CareBot AI Note (" + e.getMessage() + "): Stay well hydrated, rest adequately, and take prescribed medicines at scheduled times.";
         }
     }
 }
