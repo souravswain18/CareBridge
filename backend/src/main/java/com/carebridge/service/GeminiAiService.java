@@ -21,11 +21,11 @@ public class GeminiAiService {
 
         try {
             String[] visionEndpoints = {
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent",
-                "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent",
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-001:generateContent",
-                "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent"
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash:generateContent",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent"
             };
 
             String prompt = "You are a clinical AI medical assistant for the CareBridge Post-Hospital Recovery app. "
@@ -89,11 +89,11 @@ public class GeminiAiService {
 
         try {
             String[] modelEndpoints = {
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent",
-                "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent",
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-001:generateContent",
-                "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent"
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash:generateContent",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent"
             };
 
             String systemPrompt = "You are 'CareBot AI', an intelligent, empathetic, and multi-talented All-Rounder AI Companion & Recovery Assistant for Nivaan in India.\n"
