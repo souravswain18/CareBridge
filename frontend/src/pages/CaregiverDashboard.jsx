@@ -103,7 +103,13 @@ export const CaregiverDashboard = () => {
           }
           
           if (Array.isArray(data.vitals)) {
-            setPatientVitals(data.vitals);
+            const formattedVitals = data.vitals.map(v => ({
+              ...v,
+              systolic: Number(v.systolic) || 120,
+              diastolic: Number(v.diastolic) || 80,
+              sugar: Number(v.sugar) || 110
+            }));
+            setPatientVitals(formattedVitals);
           }
           
           if (Array.isArray(data.milestones)) {
